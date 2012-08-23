@@ -1,0 +1,19 @@
+This is (or will be) a FUSE filesystem capable of using Spotify for
+streaming music.
+
+Usage:
+
+1. Mount the filesystem
+
+2. Use
+
+Filesystem structure:
+
+Playlists/
+Starred/
+Search/
+
+
+More to come 
+
+
