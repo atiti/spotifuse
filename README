@@ -1,5 +1,6 @@
 This is (or will be) a FUSE filesystem capable of using Spotify for
 streaming music.
+Currently its in a pre-alpha proof of concept stage.
 
 Usage:
 
@@ -15,5 +16,19 @@ Search/
 
 
 More to come 
+
+DONE:
+- Hacked together filesystem structure
+- Rough playlist browsing
+- Filesize estimation
+- Streaming playback of tracks from the playlist
+- WAV header for PCM
+
+TODO:
+- Impement a proper file system structure
+- Implement starred (favourite) tracks
+- Implemnet searching with mkdir
+- Look at the possibility of returning OGG/MP3 instead of RAW PCM?
+- Cover art for albums
 
 
