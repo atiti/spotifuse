@@ -1,6 +1,6 @@
 APP_NAME=spotifuse
 CC=gcc
-CFLAGS=-ggdb -O0 -std=gnu99 -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=22
+CFLAGS=-ggdb -O2 -std=gnu99 -D_FILE_OFFSET_BITS=64 -DFUSE_USE_VERSION=22
 LDFLAGS=-lfuse -ldespotify
 CORE_OBJS=item_mgr.o spotifuse.o
 

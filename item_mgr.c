@@ -1,14 +1,16 @@
 #include "item_mgr.h"
 
-item_t*  add_item(item_t *head, char *name, char itype, char dtype, void *data) {
+item_t*  add_item(item_t *head, char *name, char itype, char dtype, void *udata) {
         item_t *curr = head;
-        item_t *new = malloc(sizeof(item_t));
+        item_t *new = (item_t *)malloc(sizeof(item_t));
         strcpy(new->name, name);
 	item_id++;
 	new->id = item_id;
         new->itype = itype;
         new->dtype = dtype;
-        new->data = data;
+        new->data = NULL;
+	new->udata = udata;
+	new->tmp_buff = NULL;
         new->next = NULL;
         new->prev = NULL;
 
@@ -18,7 +20,7 @@ item_t*  add_item(item_t *head, char *name, char itype, char dtype, void *data) 
 
 	if (!curr) {
 		new->prev = NULL;
-		curr = (struct item_t *)new;
+		curr = new;
 	} else {
 	        new->prev = (struct item_t *)curr;
        		curr->next = (struct item_t *)new;
@@ -26,13 +28,12 @@ item_t*  add_item(item_t *head, char *name, char itype, char dtype, void *data) 
 	return new;
 }
 
-item_t* add_sub_item(item_t *head, char *name, char itype, char dtype, void *data) {
+item_t* add_sub_item(item_t *head, char *name, char itype, char dtype, void *udata) {
 	item_t *curr = head;
 	item_t *i;
-	i = add_item(NULL, name, itype, dtype, data);
-	i->prev = head;
+	i = add_item(NULL, name, itype, dtype, udata);
+	i->prev = (struct item_t*)head;
 	if (curr) {
-		curr->dtype = DATA_TYPE_ITEM;
 		curr->data = (void *)i;
 	}
 	return i;	
@@ -46,13 +47,14 @@ void print_item(item_t *i) {
 		printf("Item type: %d\n", i->itype);
 		printf("Data type: %d\n", i->dtype);
 		printf("Data ptr: %p\n", i->data);
+		printf("User data ptr: %p\n", i->udata);
 		if (i->next) {
-			in = i->next;
+			in = (item_t*)i->next;
 			printf("Next ptr: %d (%p)\n", in->id, i->next);
 		} else
 			printf("Next ptr: %p\n", i->next);
 		if (i->prev) {
-			ip = i->prev;
+			ip = (item_t*)i->prev;
 			printf("Prev ptr: %d (%p)\n", ip->id, i->prev);
 		} else
 			printf("Prev ptr: %p\n", i->prev);
@@ -66,7 +68,7 @@ void print_items(item_t *head) {
 	while (curr) {
 		printf("***************\n");
 		print_item(curr);
-		if (curr->dtype == DATA_TYPE_ITEM && curr->data)
+		if (curr->data)
 			print_items((item_t *)curr->data);
 
 		curr = (item_t*)curr->next;
@@ -74,11 +76,24 @@ void print_items(item_t *head) {
 	printf("***************\n");
 }
 
+item_t* find_item_by_name_simple(item_t *head, char *name) {
+        item_t *curr = head;
+        item_t *res = NULL;
+        while (curr) {
+                if (strcmp(curr->name, name) == 0) {
+                        res = curr;
+                        break;
+                }
+                curr = (item_t*)curr->next;
+        }
+        return res;
+}
+
 item_t* find_item_by_name(item_t *head, char *name) {
 	item_t *curr = head;
 	item_t *res = NULL;
         while (curr) {
-                if (curr->dtype == DATA_TYPE_ITEM && curr->data) {
+                if (curr->data) {
                         res = find_item_by_name((item_t *)curr->data, name);
                         if (res) break;
                 }
@@ -91,11 +106,24 @@ item_t* find_item_by_name(item_t *head, char *name) {
         return res;
 }
 
+item_t* find_item_by_id_simple(item_t *head, int id) {
+        item_t *curr = head;
+        item_t *res = NULL;
+        while (curr) {
+                if (curr->id == id) {
+                        res = curr;
+                        break;
+                }
+                curr = (item_t*)curr->next;
+        }
+        return res;
+}
+
 item_t* find_item_by_id(item_t *head, int id) {
 	item_t *curr = head;
 	item_t *res = NULL;
 	while (curr) {
-		if (curr->dtype == DATA_TYPE_ITEM && curr->data) {
+		if (curr->data) {
 			res = find_item_by_id((item_t *)curr->data, id);
 			if (res) break;
 		}
@@ -112,13 +140,13 @@ void free_items(item_t *head) {
 	item_t *curr = head;
 	item_t *tmp;
 	while (curr) {
-		if (curr->dtype == DATA_TYPE_ITEM && curr->data) // recursive free tree structure
+		if (curr->data) // recursive free tree structure
 			free_items((item_t *)curr->data);
-		else if (curr->data) // just free the data
-			free(curr->data);
+		if (curr->udata) // just free the data
+			free(curr->udata);
 			
 		if (LINKED_LIST_DEBUG) printf("Freeing %p\n", curr);
-		tmp = curr->next;
+		tmp = (item_t*)curr->next;
 		free(curr);
 		curr = tmp;
 	}

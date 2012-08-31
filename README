@@ -4,7 +4,15 @@ Currently its in a pre-alpha proof of concept stage.
 
 Usage:
 
+0. Compile
+
+"make" in the source dir. You will need to have your despofity and FUSE libs/headers in place.
+
 1. Mount the filesystem
+
+Example:
+mkdir /tmp/spotifs
+./spotfy /tmp/spotifs
 
 2. Use
 
@@ -14,6 +22,8 @@ Playlists/
 Starred/
 Search/
 
+2.1 Browsing playlists
+Browsing playlists can be done by doing a directory listing
 
 More to come 
 
